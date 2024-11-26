@@ -168,7 +168,7 @@ add_library(sysinfo STATIC
 target_include_directories(sysinfo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-  target_link_libraries(sysinfo PUBLIC psapi iphlpapi ws2_32)
+  target_link_libraries(sysinfo PUBLIC psapi iphlpapi ws2_32 wbemuuid uuid wuguid ole32 oleaut32)
 elseif(APPLE)
   find_library(iokit_lib IOKit)
   if(NOT iokit_lib)
