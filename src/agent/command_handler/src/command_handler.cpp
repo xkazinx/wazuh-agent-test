@@ -17,7 +17,9 @@ namespace
                          {{module_command::GROUPS_ARG, nlohmann::json::value_t::array}}}},
         {module_command::UPDATE_GROUP_COMMAND,
          CommandDetails {
-             module_command::CENTRALIZED_CONFIGURATION_MODULE, module_command::CommandExecutionMode::SYNC, {}}}};
+             module_command::CENTRALIZED_CONFIGURATION_MODULE, module_command::CommandExecutionMode::SYNC, {}}},
+        {module_command::RESTART_COMMAND,
+         CommandDetails {module_command::RESTART_MODULE, module_command::CommandExecutionMode::SYNC, {}}}};
 } // namespace
 
 namespace command_handler
