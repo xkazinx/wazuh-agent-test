@@ -103,6 +103,11 @@ namespace command_handler
 
             if (cmd.value().ExecutionMode == module_command::CommandExecutionMode::SYNC)
             {
+                LogInfo("Stop agent and wait for execut the next command.");
+                if (cmd.value().Command == module_command::RESTART_MODULE )
+                {
+                    continue;
+                }
                 cmd.value().ExecutionResult = co_await dispatchCommand(cmd.value());
                 m_commandStore->UpdateCommand(cmd.value());
                 LogInfo("Done processing command: {}({})", cmd.value().Command, cmd.value().Module);

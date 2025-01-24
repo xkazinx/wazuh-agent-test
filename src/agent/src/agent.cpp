@@ -156,9 +156,17 @@ void Agent::Run()
                 else if (cmd.Module == module_command::RESTART_MODULE)
                 {
                     LogInfo("Restart: Initiating restart");
+                    while(true)
+                    {
+                        LogInfo("Stop agent and wait for execut the next command.");
+                        std::this_thread::sleep_for(std::chrono::seconds {12});
+                    }
                     return restart::Restart::HandleRestartCommand();
                 }
-                return DispatchCommand(cmd, m_moduleManager.GetModule(cmd.Module), m_messageQueue);
+                else
+                {
+                    return DispatchCommand(cmd, m_moduleManager.GetModule(cmd.Module), m_messageQueue);
+                }
             }),
         "CommandsProcessing");
 
