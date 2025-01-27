@@ -16,6 +16,8 @@
 #include <memory>
 #include <string>
 
+#include <iostream>
+
 // NOLINTBEGIN(cppcoreguidelines-avoid-capturing-lambda-coroutines)
 
 using namespace testing;
@@ -58,6 +60,33 @@ namespace
         events:
           batch_size: 1
     )"));
+
+    class TestCommunicator : public communicator::Communicator
+    {
+    public:
+        TestCommunicator(std::unique_ptr<http_client::IHttpClient> httpClient,
+                         std::shared_ptr<configuration::ConfigurationParser> configurationParser,
+                         std::string uuid,
+                         std::string key,
+                         std::function<std::string()> getHeaderInfo)
+            : communicator::Communicator(std::move(httpClient),
+                                         configurationParser,
+                                         std::move(uuid),
+                                         std::move(key),
+                                         std::move(getHeaderInfo)) {};
+
+        void SetRetryInterval(int retryInterval)
+        {
+            m_retryInterval = retryInterval;
+        }
+
+        [[nodiscard]] long GetTokenRemainingSecs() const override
+        {
+            std::cout << "Hola!!\n";
+            return 1;
+        }
+    };
+
 } // namespace
 
 TEST(CommunicatorTest, CommunicatorConstructor)
@@ -94,8 +123,10 @@ TEST(CommunicatorTest, StatelessMessageProcessingTask_FailedAuthenticationLeaves
     // not really a leak, as its lifetime is managed by the Communicator
     testing::Mock::AllowLeak(mockHttpClientPtr);
 
-    auto communicatorPtr = std::make_shared<communicator::Communicator>(
-        std::move(mockHttpClient), MOCK_CONFIG_PARSER_LOOP, "uuid", "key", nullptr);
+    auto communicatorPtr =
+        std::make_shared<TestCommunicator>(std::move(mockHttpClient), MOCK_CONFIG_PARSER_LOOP, "uuid", "key", nullptr);
+
+    communicatorPtr->SetRetryInterval(1); // NOLINT (cppcoreguidelines-avoid-magic-numbers)
 
     // A failed authentication won't return a token
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
@@ -143,8 +174,8 @@ TEST(CommunicatorTest, StatelessMessageProcessingTask_CallsWithValidToken)
     // not really a leak, as its lifetime is managed by the Communicator
     testing::Mock::AllowLeak(mockHttpClientPtr);
 
-    auto communicatorPtr = std::make_shared<communicator::Communicator>(
-        std::move(mockHttpClient), MOCK_CONFIG_PARSER_LOOP, "uuid", "key", nullptr);
+    auto communicatorPtr =
+        std::make_shared<TestCommunicator>(std::move(mockHttpClient), MOCK_CONFIG_PARSER_LOOP, "uuid", "key", nullptr);
 
     const auto mockedToken = CreateToken();
 

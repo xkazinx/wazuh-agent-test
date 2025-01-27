@@ -40,6 +40,9 @@ namespace communicator
                      std::string key,
                      std::function<std::string()> getHeaderInfo);
 
+        /// @brief Communicator destructor
+        virtual ~Communicator() = default;
+
         /// @brief Sends an authentication request to the manager
         /// @return true if the request was sent successfully, false otherwise
         bool SendAuthenticationRequest();
@@ -79,10 +82,14 @@ namespace communicator
         /// @brief Stops the communication process
         void Stop();
 
+    protected:
+        /// @brief Time in milliseconds between authentication attemps in case of failure
+        std::time_t m_retryInterval = config::agent::DEFAULT_RETRY_INTERVAL;
+
     private:
         /// @brief Calculates the remaining time (in seconds) until the authentication token expires
         /// @return The remaining time in seconds until the authentication token expires
-        long GetTokenRemainingSecs() const;
+        virtual long GetTokenRemainingSecs() const;
 
         /// @brief Checks if the authentication token has expired and authenticates again if necessary
         void TryReAuthenticate();
@@ -107,9 +114,6 @@ namespace communicator
 
         /// @brief Indicates if an authentication attempt is currently in progress
         std::atomic<bool> m_isReAuthenticating = false;
-
-        /// @brief Time in milliseconds between authentication attemps in case of failure
-        std::time_t m_retryInterval = config::agent::DEFAULT_RETRY_INTERVAL;
 
         /// @brief Size for batch requests
         size_t m_batchSize = config::agent::DEFAULT_BATCH_SIZE;
