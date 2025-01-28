@@ -20,6 +20,124 @@
 
 #include <boost/asio/awaitable.hpp>
 
+
+#include <iostream> 
+
+class Benchmark
+{
+public:
+    enum ID
+    {   
+        PACKAGES,
+        PACKAGES_NORMALIZE,
+        PACKAGES_REMOVE_EXCLUDED,
+        PACKAGES_SYNCTXNROW,
+        PACKAGES_GETDELETEDROWS,
+
+        PROCESSES,
+        PROCESSES_SYNCTXNROW,
+        PROCESSES_GETDELETEDROWS,
+        Max,
+    };
+
+    static std::string GetIDName(ID id)
+    {
+        switch(id)
+        {
+            case PACKAGES:
+                return "PACKAGES";
+            case PACKAGES_NORMALIZE:
+                return "PACKAGES_NORMALIZE";
+            case PACKAGES_REMOVE_EXCLUDED:
+                return "PACKAGES_REMOVE_EXCLUDED";
+            case PACKAGES_SYNCTXNROW:
+                return "PACKAGES_SYNCTXNROW";
+            case PACKAGES_GETDELETEDROWS:
+                return "PACKAGES_GETDELETEDROWS";
+            case PROCESSES:
+                return "PROCESSES";
+            case PROCESSES_SYNCTXNROW:
+                return "PROCESSES_SYNCTXNROW";
+            case PROCESSES_GETDELETEDROWS:
+                return "PROCESSES_GETDELETEDROWS";
+
+            case Max:
+                return "";
+        }
+
+        return "";
+    }
+
+    class Unit
+    {        
+    public:
+        unsigned int m_totalTime = 0;
+        unsigned int m_totalCalls = 0;
+        ID m_id;
+
+        std::chrono::steady_clock::time_point _start;
+
+        Unit() {}
+        
+        void Start()
+        {
+            ++m_totalCalls;
+            _start = std::chrono::steady_clock::now();
+        }
+
+        void Reset()
+        {
+            m_totalTime = m_totalCalls = 0;
+        }
+
+        void End()
+        {
+            auto end = std::chrono::steady_clock::now();
+            auto dif = std::chrono::duration_cast<std::chrono::milliseconds>(end - _start).count();
+
+            auto tm = std::chrono::duration<unsigned int, std::milli>(dif).count();
+            m_totalTime += tm;
+        }
+    };
+
+    using Array = std::array<Unit, ID::Max>;
+    static Array m_list;
+    
+    static void Start(ID id)
+    {
+        m_list[id].m_id = id;
+        m_list[id].Start();
+    }
+
+    static void End(ID id)
+    {
+        m_list[id].End();
+    }
+
+    static void Reset(ID id = ID::Max)
+    {
+        if (id == ID::Max)
+        {
+            for(auto & item : m_list)
+            {
+                item.Reset();
+            }
+        }
+        else 
+        {
+            m_list[id].Reset();
+        }
+    }
+
+    static void Print()
+    {
+        for(auto & item : m_list)
+        {
+            std::cout << "Benchmark for " << GetIDName(item.m_id) << ": took " << item.m_totalTime << " in " << item.m_totalCalls << " calls" << std::endl;
+        }
+    }
+};  
+
 class Inventory
 {
 public:

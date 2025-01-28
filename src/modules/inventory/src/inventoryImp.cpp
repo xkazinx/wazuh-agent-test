@@ -10,6 +10,8 @@
 #include <stringHelper.h>
 #include <timeHelper.h>
 
+Benchmark::Array Benchmark::m_list;
+
 constexpr std::time_t INVENTORY_DEFAULT_INTERVAL {3600000};
 constexpr size_t MAX_ID_SIZE = 512;
 
@@ -784,26 +786,46 @@ void Inventory::ScanPackages()
 
         std::unique_lock<std::mutex> lock {m_mutex};
         DBSyncTxn txn {m_spDBSync->handle(), nlohmann::json {PACKAGES_TABLE}, 0, QUEUE_SIZE, callback};
-        m_spInfo->packages(
-            [this, &txn](nlohmann::json& rawData)
-            {
-                nlohmann::json input;
-
-                input["table"] = PACKAGES_TABLE;
-                m_spNormalizer->Normalize("packages", rawData);
-                m_spNormalizer->RemoveExcluded("packages", rawData);
-
-                if (!rawData.empty())
+        
+        {
+            Benchmark::Start(Benchmark::PACKAGES);
+            m_spInfo->packages(
+                [this, &txn](nlohmann::json& rawData)
                 {
-                    input["data"] = nlohmann::json::array({rawData});
-                    if (m_packagesFirstScan)
+                    nlohmann::json input;
+
+                    input["table"] = PACKAGES_TABLE;
                     {
-                        input["options"]["return_old_data"] = true;
+                        Benchmark::Start(Benchmark::PACKAGES_NORMALIZE);
+                        m_spNormalizer->Normalize("packages", rawData);
+                        Benchmark::End(Benchmark::PACKAGES_NORMALIZE);
                     }
-                    txn.syncTxnRow(input);
-                }
-            });
-        txn.getDeletedRows(callback);
+                    {
+                        Benchmark::Start(Benchmark::PACKAGES_REMOVE_EXCLUDED);
+                        m_spNormalizer->RemoveExcluded("packages", rawData);
+                        Benchmark::End(Benchmark::PACKAGES_REMOVE_EXCLUDED);
+                    }
+
+                    if (!rawData.empty())
+                    {
+                        input["data"] = nlohmann::json::array({rawData});
+                        if (m_packagesFirstScan)
+                        {
+                            input["options"]["return_old_data"] = true;
+                        }
+                        Benchmark::Start(Benchmark::PACKAGES_SYNCTXNROW);
+                        txn.syncTxnRow(input);
+                        Benchmark::End(Benchmark::PACKAGES_SYNCTXNROW);
+                    }
+                });
+
+            Benchmark::End(Benchmark::PACKAGES);
+        }
+        {
+            Benchmark::Start(Benchmark::PACKAGES_GETDELETEDROWS);
+            txn.getDeletedRows(callback);
+            Benchmark::End(Benchmark::PACKAGES_GETDELETEDROWS);
+        }
 
         if (!m_packagesFirstScan)
         {
@@ -925,21 +947,32 @@ void Inventory::ScanProcesses()
                              }};
         std::unique_lock<std::mutex> lock {m_mutex};
         DBSyncTxn txn {m_spDBSync->handle(), nlohmann::json {PROCESSES_TABLE}, 0, QUEUE_SIZE, callback};
-        m_spInfo->processes(std::function<void(nlohmann::json&)>(
-            [this, &txn](nlohmann::json& rawData)
-            {
-                nlohmann::json input;
-                input["table"] = PROCESSES_TABLE;
-                input["data"] = nlohmann::json::array({rawData});
+        {
+            Benchmark::Start(Benchmark::PROCESSES);
 
-                if (m_processesFirstScan)
+            m_spInfo->processes(std::function<void(nlohmann::json&)>(
+                [this, &txn](nlohmann::json& rawData)
                 {
-                    input["options"]["return_old_data"] = true;
-                }
+                    nlohmann::json input;
+                    input["table"] = PROCESSES_TABLE;
+                    input["data"] = nlohmann::json::array({rawData});
 
-                txn.syncTxnRow(input);
-            }));
-        txn.getDeletedRows(callback);
+                    if (m_processesFirstScan)
+                    {
+                        input["options"]["return_old_data"] = true;
+                    }
+
+                    txn.syncTxnRow(input);
+                }));
+
+            Benchmark::End(Benchmark::PROCESSES);
+        }
+        
+        {
+            Benchmark::Start(Benchmark::PROCESSES_GETDELETEDROWS);
+            txn.getDeletedRows(callback);
+            Benchmark::End(Benchmark::PROCESSES_GETDELETEDROWS);
+        }
 
         if (!m_processesFirstScan)
         {
@@ -956,6 +989,8 @@ void Inventory::Scan()
     LogInfo("Starting evaluation.");
     m_scanTime = Utils::getCurrentISO8601();
 
+    Benchmark::Reset();
+
     TryCatchTask([&]() { ScanHardware(); });
     TryCatchTask([&]() { ScanSystem(); });
     TryCatchTask([&]() { ScanPackages(); });
@@ -963,6 +998,8 @@ void Inventory::Scan()
     TryCatchTask([&]() { ScanHotfixes(); });
     TryCatchTask([&]() { ScanPorts(); });
     TryCatchTask([&]() { ScanNetwork(); });
+
+    Benchmark::Print();
 
     m_notify = true;
     LogInfo("Evaluation finished.");
@@ -974,6 +1011,7 @@ void Inventory::SyncLoop()
 
     if (m_scanOnStart && !m_stopping)
     {
+        LogInfo("First scan");
         Scan();
     }
 
