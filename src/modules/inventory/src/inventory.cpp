@@ -5,6 +5,8 @@
 #include <defs.h>
 #include <logger.hpp>
 #include <sysInfo.hpp>
+#include <timeHelper.h>
+#include <fstream>
 
 void Inventory::Start()
 {
@@ -103,8 +105,8 @@ void Inventory::SetPushMessageFunction(const std::function<int(Message)>& pushMe
 
 void Inventory::SendDeltaEvent(const std::string& data)
 {
-
     const auto jsonData = nlohmann::json::parse(data);
+    Benchmark::End(Benchmark::SENDDELTAEVENT);
 
     const Message statefulMessage {MessageType::STATEFUL,
                                    jsonData["metadata"]["operation"] == "delete" ? "{}"_json : jsonData["data"],
@@ -214,6 +216,19 @@ cJSON* Inventory::Dump() const
     cJSON_AddItemToObject(rootJson, "inventory", invJson);
 
     return rootJson;
+}
+
+void Benchmark::Print()
+{
+    std::ofstream out("benchmark.txt", std::ios::app);
+    std::string str;
+    for(auto & item : m_list)
+    {
+        str = Utils::getCurrentISO8601() + ": Benchmark for " + GetIDName(item.m_id) + 
+            ": took " + std::to_string(item.m_totalTime) + "ms in " + std::to_string(item.m_totalCalls) + " calls\n";
+
+        std::cout << str;
+    }
 }
 
 void Inventory::LogErrorInventory(const std::string& log)

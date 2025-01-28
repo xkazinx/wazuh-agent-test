@@ -344,8 +344,11 @@ void Inventory::NotifyEvent(ReturnTypeCallback result,
     msg["stateless"] = stateless;
     msg["data"]["@timestamp"] = m_scanTime;
 
-    const auto msgToSend = msg.dump();
-    m_reportDiffFunction(msgToSend);
+    {
+        Benchmark::Start(Benchmark::SENDDELTAEVENT);
+        const auto msgToSend = msg.dump();
+        m_reportDiffFunction(msgToSend);
+    }
 }
 
 void Inventory::UpdateChanges(const std::string& table, const nlohmann::json& values, const bool isFirstScan)
@@ -962,7 +965,11 @@ void Inventory::ScanProcesses()
                         input["options"]["return_old_data"] = true;
                     }
 
+                {
+                    Benchmark::Start(Benchmark::PROCESSES_SYNCTXNROW);
                     txn.syncTxnRow(input);
+                    Benchmark::End(Benchmark::PROCESSES_SYNCTXNROW);
+                }
                 }));
 
             Benchmark::End(Benchmark::PROCESSES);

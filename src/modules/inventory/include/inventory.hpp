@@ -37,6 +37,9 @@ public:
         PROCESSES,
         PROCESSES_SYNCTXNROW,
         PROCESSES_GETDELETEDROWS,
+
+        SENDDELTAEVENT,
+
         Max,
     };
 
@@ -60,6 +63,8 @@ public:
                 return "PROCESSES_SYNCTXNROW";
             case PROCESSES_GETDELETEDROWS:
                 return "PROCESSES_GETDELETEDROWS";
+            case SENDDELTAEVENT:
+                return "SENDDELTAEVENT";
 
             case Max:
                 return "";
@@ -129,13 +134,7 @@ public:
         }
     }
 
-    static void Print()
-    {
-        for(auto & item : m_list)
-        {
-            std::cout << "Benchmark for " << GetIDName(item.m_id) << ": took " << item.m_totalTime << " in " << item.m_totalCalls << " calls" << std::endl;
-        }
-    }
+    static void Print();
 };  
 
 class Inventory
