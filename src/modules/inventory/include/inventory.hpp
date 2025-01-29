@@ -39,7 +39,8 @@ public:
         PROCESSES_GETDELETEDROWS,
 
         SENDDELTAEVENT,
-
+        SYSINFO_GETPACKAGES,
+        
         Max,
     };
 
@@ -65,7 +66,8 @@ public:
                 return "PROCESSES_GETDELETEDROWS";
             case SENDDELTAEVENT:
                 return "SENDDELTAEVENT";
-
+            case SYSINFO_GETPACKAGES:
+                return "SYSINFO_GETPACKAGES";
             case Max:
                 return "";
         }
