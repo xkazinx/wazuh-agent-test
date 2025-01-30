@@ -80,6 +80,11 @@ namespace
             m_retryInterval = retryInterval;
         }
 
+        [[nodiscard]] time_t GetRetryInterval() const
+        {
+            return m_retryInterval;
+        }
+
         [[nodiscard]] long GetTokenRemainingSecs() const override
         {
             std::cout << "Hola!!\n";
@@ -105,6 +110,22 @@ TEST(CommunicatorTest, CommunicatorConstructorNoHttpClient)
 
     EXPECT_THROW(communicator::Communicator communicator(nullptr, configurationParser, "uuid", "key", nullptr),
                  std::runtime_error);
+}
+
+TEST(CommunicatorTest, CommunicatorConstructorInvalidRetryInterval)
+{
+    std::string strConfig = R"(
+        agent:
+          server_url: 192.168.0.11
+          retry_interval: -1ms
+    )";
+    auto configurationParser = std::make_shared<configuration::ConfigurationParser>(strConfig);
+    std::cout << "retry_interval: "
+              << configurationParser->GetConfig<std::time_t>("agent", "retry_interval").value_or(0) << "\n";
+    auto mockHttpClient = std::make_unique<MockHttpClient>();
+
+    TestCommunicator communicator(std::move(mockHttpClient), configurationParser, "uuid", "key", nullptr);
+    EXPECT_EQ(communicator.GetRetryInterval(), config::agent::DEFAULT_RETRY_INTERVAL);
 }
 
 TEST(CommunicatorTest, CommunicatorConstructorNoConfigParser)
