@@ -9,13 +9,11 @@
  * Foundation.
  */
 
-#ifndef _SYSINFO_WIN_TEST_H
-#define _SYSINFO_WIN_TEST_H
+#pragma once
 
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 
-#define WMI_WUA_DLL
 #include "utilsWrapperWin.hpp"
 
 class SysInfoWinTest : public ::testing::Test
@@ -44,6 +42,3 @@ class MockComHelper : public IComHelper
         MOCK_METHOD(HRESULT, GetItem, (IUpdateHistoryEntryCollection* pHistory, LONG index, IUpdateHistoryEntry** pEntry), (override));
         MOCK_METHOD(HRESULT, GetTitle, (IUpdateHistoryEntry* pEntry, BSTR& title), (override));
 };
-
-
-#endif //_SYSINFO_WIN_TEST_H

@@ -16,7 +16,6 @@
 #include <string>         // For std::string and std::wstring
 #include <locale>         // For localization utilities (if needed for string conversion)
 
-#define WMI_WUA_DLL
 #include "utilsWrapperWin.hpp"
 
 

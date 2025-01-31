@@ -10,7 +10,7 @@
  */
 #pragma once
 
-#ifdef WMI_WUA_DLL
+#ifdef _WIN32
 #ifdef WIN_EXPORT
 #define EXPORTED __declspec(dllexport)
 #else
