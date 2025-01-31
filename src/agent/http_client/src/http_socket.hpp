@@ -10,6 +10,7 @@
 #include <boost/system/error_code.hpp>
 
 #include <exception>
+#include <iostream> // REMOVE
 #include <string>
 
 namespace http_client
@@ -42,9 +43,11 @@ namespace http_client
         {
             try
             {
+                std::cout << "Connect" << "\n";
                 m_socket.expires_after(std::chrono::seconds(http_client::SOCKET_TIMEOUT_SECS));
                 m_socket.async_connect(endpoints,
                                        [&ec](boost::system::error_code const& code, auto const&) { ec = code; });
+                std::cout << "Async connect returned: " << ec.message() << "\n";
             }
             catch (const std::exception& e)
             {
@@ -155,6 +158,11 @@ namespace http_client
             {
                 LogDebug("Exception thrown on socket closing: {}", e.what());
             }
+        }
+
+        bool IsOpen()
+        {
+            return m_socket.socket().is_open();
         }
 
     private:
