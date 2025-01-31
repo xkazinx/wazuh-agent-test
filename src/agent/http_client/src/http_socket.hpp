@@ -10,6 +10,7 @@
 #include <boost/system/error_code.hpp>
 
 #include <exception>
+#include <iostream> // REMOVE
 #include <string>
 
 namespace http_client
@@ -155,6 +156,11 @@ namespace http_client
             {
                 LogDebug("Exception thrown on socket closing: {}", e.what());
             }
+        }
+
+        bool IsOpen()
+        {
+            return m_socket.socket().is_open();
         }
 
     private:
