@@ -6,6 +6,12 @@ target_include_directories(http_client_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/
 target_link_libraries(http_client_test PUBLIC HttpClient GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)
 add_test(NAME HttpClientTest COMMAND http_client_test)
 
+add_executable(http_resolver_test http_resolver_test.cpp)
+configure_target(http_resolver_test)
+target_include_directories(http_resolver_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)
+target_link_libraries(http_resolver_test PUBLIC Communicator GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)
+add_test(NAME HttpResolverTest COMMAND http_resolver_test)
+
 if(WIN32)
     add_executable(https_verifier_test certificate/https_verifier_win_test.cpp)
     configure_target(https_verifier_test)
