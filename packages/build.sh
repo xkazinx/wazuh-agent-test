@@ -116,7 +116,7 @@ fi
 # Build directories
 source_dir=$(build_directories "$build_dir/${BUILD_TARGET}" "wazuh*" $future)
 
-wazuh_version="$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' wazuh-agent/VERSION.json)"
+wazuh_version="$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' wazuh*/VERSION.json)"
 # TODO: Improve how we handle package_name
 # Changing the "-" to "_" between target and version breaks the convention for RPM or DEB packages.
 # For now, I added extra code that fixes it.
