@@ -8,10 +8,8 @@ on:
         - reopened
         
   workflow_run:
-      workflows: 
-        - "Compile"
-      types:
-        - completed
+      workflows: ["Compile"]
+      types: ["completed"]
 
 jobs:
   ctest:
