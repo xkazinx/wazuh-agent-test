@@ -8,7 +8,8 @@ on:
         - reopened
         
   workflow_run:
-      workflows: ["Compile"]
+      workflows: 
+        - "Compile"
       types:
         - completed
 
@@ -27,6 +28,7 @@ jobs:
         with:
           name: build-artifact
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
 
       - name: Run Tests
         uses: ./.github/actions/4_testintegration_ctest
