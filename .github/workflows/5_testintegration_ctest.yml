@@ -26,6 +26,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-artifact
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Tests
         uses: ./.github/actions/4_testintegration_ctest
