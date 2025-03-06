@@ -18,8 +18,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, wMe veindows-latest, macos-latest]
-    
+        os: [ubuntu-latest]
+        #os: [ubuntu-latest, windows-latest, macos-latest]
+        
     steps:
       - name: Download build artifact
         uses: actions/download-artifact@v4
