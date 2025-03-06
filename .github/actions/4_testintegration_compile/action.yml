@@ -14,7 +14,8 @@ runs:
   using: "composite"
   steps:
     - name: "Test"
-      run: echo "The input variable is: ${{ inputs.build_path }}"
+      run: |
+        echo ${{ inputs.build_path }}
       shell: bash
 
     - name: Generate CMake project
