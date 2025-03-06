@@ -8,8 +8,8 @@ on:
         - reopened
         
   workflow_run:
-      workflows: ["Compile"]
-      types: ["completed"]
+      workflows: [Compile]
+      types: [completed]
 
 jobs:
   ctest:
@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, wMe veindows-latest, macos-latest]
     
     steps:
       - name: Download build artifact
