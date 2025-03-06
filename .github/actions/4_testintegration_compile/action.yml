@@ -14,9 +14,9 @@ runs:
   using: "composite"
   steps:
     - name: "Test"
-      run: echo "The input variable is: ${{ inputs.outputs.myInput }}"
+      run: echo "The input variable is: ${{ inputs.build_path }}"
       shell: bash
-      
+
     - name: Generate CMake project
       run: |
         SRC_FOLDER=$(pwd)/${{ inputs.path }}
