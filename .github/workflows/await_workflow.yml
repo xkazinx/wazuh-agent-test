@@ -20,7 +20,7 @@ jobs:
         token: ${{ github.token }}
         repo: wazuh-agent-test
         owner: xkazinx
-        workflow: test_2.yml
+        workflow: test.yml
     - name: Await Run ID ${{ steps.return_dispatch.outputs.run_id }}
       uses: Codex-/await-remote-run@v1.0.0
       with:
@@ -28,3 +28,10 @@ jobs:
         repo: wazuh-agent-test
         owner: xkazinx
         run_id: ${{ steps.return_dispatch.outputs.run_id }}
+    - name: Check Remote Workflow Status
+      if: ${{ steps.await.outputs.conclusion == 'success' }}
+      run: echo "Success!!!"
+    - name: Check Remote Workflow Status
+      if: ${{ steps.await.outputs.conclusion != 'success' }}
+      run: echo "Failure!!!"
+
