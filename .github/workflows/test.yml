@@ -47,8 +47,11 @@ jobs:
       
     - name: Commit and Push
       run: |
+        git init
+        git add workflow_id.txt
         git config --global user.name "Workflow ID Test"
         git config --global user.email "workflow_id_test@test.com"
-        git add workflow_id.txt
         git commit -m "Workflow ID"
-        git push
+        git branch -M main
+        git remote add origin https://github.com/xkazinx/wazuh-agent-workflow-ids.git
+        git push -u origin main
