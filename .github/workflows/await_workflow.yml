@@ -17,6 +17,7 @@ jobs:
       uses: codex-/return-dispatch@v1
       id: return_dispatch
       with:
+        token: ${{ secrets.GITHUB_TOKEN }}
         repo: wazuh-agent-test
         owner: xkazinx
         workflow: test.yml
@@ -24,6 +25,7 @@ jobs:
     - name: Await Run ID ${{ steps.return_dispatch.outputs.run_id }}
       uses: Codex-/await-remote-run@v1.0.0
       with:
+        token: ${{ secrets.GITHUB_TOKEN }}
         repo: wazuh-agent-test
         owner: xkazinx
         run_id: ${{ steps.return_dispatch.outputs.run_id }}
