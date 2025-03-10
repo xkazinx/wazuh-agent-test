@@ -1,15 +1,15 @@
 name: Run Tests
 
 on:
-  pull_request:
-      types:
-        - opened
-        - synchronize
-        - reopened
+  #pull_request:
+  #    types:
+  #      - opened
+  #      - synchronize
+  #      - reopened
         
   workflow_run:
-      workflows: ["Compile"]
-      types: ["completed"]
+      workflows: [Compile]
+      types: [completed]
 
 jobs:
   ctest:
@@ -18,14 +18,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    
+        os: [ubuntu-latest]
+        #os: [ubuntu-latest, windows-latest, macos-latest]
+        
     steps:
       - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
           name: build-artifact
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ github.token }}
+          repostitory: ${{ github.repository }}
           run-id: ${{ github.event.workflow_run.id }}
 
       - name: Run Tests

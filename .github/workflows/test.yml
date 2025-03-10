@@ -1,0 +1,52 @@
+name: Test
+
+on:
+    pull_request:
+      types:
+        - opened
+        - synchronize
+        - reopened
+
+env:
+  VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
+
+jobs:
+  compile:
+    runs-on: ${{ matrix.os }}
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        #os: [ubuntu-latest, windows-latest, macos-latest]
+        
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Create File with Run ID
+      run: |
+        mkdir workflow_id
+        echo "${{ github.run_id }}" > workflow_id/workflow_id.txt
+      shell: bash
+      
+    #- name: Commit and Push
+    #  run: |
+    #    cd workflow_id
+    #    git init
+    #    git add workflow_id.txt
+    #    git config --global user.name "Workflow ID Test"
+    #    git config --global user.email "workflow_id_test@test.com"
+    #    git commit -m "Workflow ID"
+    #    git branch -M main
+    #    git remote add origin https://${{ github.token }}@github.com/xkazinx/wazuh-agent-workflow-ids.git
+    #    git push -u origin main
+
+    - name: Upload generated artifact
+      uses: actions/upload-artifact@v4
+      id: upload-generated-artifact
+      with:
+        name: build-output 
+        path: workflow_id
