@@ -1,9 +1,9 @@
-name: Deploy
+name: WorkflowB
 on:
   workflow_run:
-    workflows: [Test]
-    branches: [more_tests]
-    types: [completed]
+    workflows: [WorkflowA]
+    types: 
+        - completed
 jobs:
   deploy:
     name: Deploy
