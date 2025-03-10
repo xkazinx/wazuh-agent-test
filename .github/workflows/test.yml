@@ -5,11 +5,11 @@ on:
         inputs:
             distinct_id:
                 required: false
-    pull_request:
-      types:
-        - opened
-        - synchronize
-        - reopened
+    #pull_request:
+    #  types:
+    #    - opened
+    #    - synchronize
+    #    - reopened
 
 env:
   VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
