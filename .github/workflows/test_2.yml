@@ -4,8 +4,6 @@ on:
     workflows: [Test2]
     types: 
         - completed
-    branches:
-        - main
 jobs:
   deploy:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
