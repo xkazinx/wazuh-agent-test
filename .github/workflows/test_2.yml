@@ -6,7 +6,6 @@ on:
         - completed
     branches:
         - main
-        - more_tests_4
 jobs:
   deploy:
     #if: ${{ github.event.workflow_run.conclusion == 'success' }}
