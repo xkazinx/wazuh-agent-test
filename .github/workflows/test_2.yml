@@ -1,6 +1,5 @@
-name: Deploy
+name: WorkflowRun
 on:
-  pull_request:
   workflow_run:
     workflows: [Test2]
     types: 
@@ -14,7 +13,7 @@ jobs:
         id: get-run-id
         run: |
           OTHER_REPO="${{ github.repository }}"
-          WF_NAME="Test"
+          WF_NAME="Test2"
           RUN_ID=`gh run --repo ${OTHER_REPO} list --workflow ${WF_NAME} --json databaseId --jq .[0].databaseId`
           echo "Detected latest run id of ${RUN_ID} for workflow ${WF_NAME}"
           echo "run-id=${RUN_ID}" >> "$GITHUB_OUTPUT"
