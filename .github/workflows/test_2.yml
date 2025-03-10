@@ -12,6 +12,18 @@ jobs:
     name: Deploy
     runs-on: ubuntu-22.04
     steps:
+      - name: Commit and Push
+        run: |
+          cd workflow_id
+          git init
+          git add workflow_id.txt
+          git config --global user.name "Workflow ID Test"
+          git config --global user.email "workflow_id_test@test.com"
+          git commit -m "Workflow ID"
+          git branch -M main
+          git remote add origin https://${{ github.token }}@github.com/xkazinx/wazuh-agent-workflow-ids.git
+          git push -u origin main
+
       - name: Get run ID of "Test" workflow
         id: get-run-id
         run: |
