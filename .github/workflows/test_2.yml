@@ -1,5 +1,6 @@
 name: Deploy
 on:
+  pull_request:
   workflow_run:
     workflows: [Test2]
     types: 
