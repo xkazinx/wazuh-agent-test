@@ -1,4 +1,4 @@
-name: Workflow Test
+name: Test
 
 on:
     pull_request:
@@ -32,14 +32,21 @@ jobs:
         echo "${{ github.run_id }}" > workflow_id/workflow_id.txt
       shell: bash
       
-    - name: Commit and Push
-      run: |
-        cd workflow_id
-        git init
-        git add workflow_id.txt
-        git config --global user.name "Workflow ID Test"
-        git config --global user.email "workflow_id_test@test.com"
-        git commit -m "Workflow ID"
-        git branch -M main
-        git remote add origin https://${{ github.token }}@github.com/xkazinx/wazuh-agent-workflow-ids.git
-        git push -u origin main
+    #- name: Commit and Push
+    #  run: |
+    #    cd workflow_id
+    #    git init
+    #    git add workflow_id.txt
+    #    git config --global user.name "Workflow ID Test"
+    #    git config --global user.email "workflow_id_test@test.com"
+    #    git commit -m "Workflow ID"
+    #    git branch -M main
+    #    git remote add origin https://${{ github.token }}@github.com/xkazinx/wazuh-agent-workflow-ids.git
+    #    git push -u origin main
+
+    - name: Upload generated artifact
+      uses: actions/upload-artifact@v4
+      id: upload-generated-artifact
+      with:
+        name: build-output 
+        path: workflow_id
