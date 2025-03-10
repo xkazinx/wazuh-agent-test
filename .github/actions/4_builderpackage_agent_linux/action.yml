@@ -51,15 +51,29 @@ runs:
       uses: ./.github/actions/4_docker_exec
       with:
         container_name: builder_container
-        commands: cd /wazuh-local-src && cmake src -B src/build && cmake --build src/build --parallel $(nproc) && rm -rf src/build/_deps src/build/vcpkg*
+        commands: cd /wazuh-local-src && cmake src -B src/build-linux && cmake --build src/build-linux --parallel $(nproc) && rm -rf src/build-linux/_deps src/build-linux/vcpkg*
 
     - name: Zip repository
+      if: github.event_name != 'pull_request'
       shell: bash
       run: |
         zip -r ${{ github.workspace }}/wazuh-agent-binaries-${{ inputs.architecture }}.zip ${{ github.workspace }}/
 
     - name: Upload wazuh-agent-binaries.zip
+      if: github.event_name != 'pull_request'
       uses: actions/upload-artifact@v4
       with:
         name: wazuh-agent-binaries-${{ inputs.architecture }}
         path: ${{ github.workspace }}/wazuh-agent-binaries-${{ inputs.architecture }}.zip
+
+    - name: Zip build-linux.zip
+      shell: bash
+      run: |
+        zip -r ${{ github.workspace }}/build-linux.zip wazuh-local-src/src/build-linux/
+
+    - name: Upload build-linux.zip
+      uses: actions/upload-artifact@v4
+      with:
+        name: wazuh-agent-build-linux
+        path: ${{ github.workspace }}/build-linux.zip
+

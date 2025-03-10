@@ -2,6 +2,12 @@ run-name: Packages - Build Wazuh agent Linux packages - ${{ inputs.architecture 
 name: Build Wazuh agent Linux packages
 
 on:
+  #pull_request:
+    #types:
+    #  - opened
+    #  - synchronize
+    #  - reopened
+
   workflow_dispatch:
     inputs:
       docker_image_tag:
@@ -15,20 +21,22 @@ on:
       architecture:
         type: choice
         description: Package architecture [amd64, arm64, x86_64, aarch64].
-        required: true
+        required: false
         options:
           - amd64
           - arm64
           - x86_64
           - aarch64
+        default: x86_64
       system:
         type: choice
         description: Package OS [deb, rpm].
-        required: true
+        required: false
         options:
           - deb
           - rpm
           - both
+        default: deb
       revision:
         description: |
           Package revision (name and metadata).
@@ -50,7 +58,8 @@ on:
       source_reference:
         description: |
           Branch from wazuh/wazuh-agent repository to use.
-        required: true
+        required: false
+        default: main
       upload_to_s3:
         type: boolean
         description: |
@@ -80,10 +89,10 @@ on:
         default: 'auto'
       architecture:
         type: string
-        required: true
+        required: false
       system:
         type: string
-        required: true
+        required: false
       revision:
         type: string
         required: false
@@ -95,10 +104,10 @@ on:
         required: false
       source_reference:
         type: string
-        required: true
+        required: false
       upload_to_s3:
         type: boolean
-        required: true
+        required: false
       extensive_testing:
         type: boolean
         required: false
@@ -113,11 +122,16 @@ jobs:
     name: Build Wazuh agent Linux binaries - ${{ inputs.architecture }} - ${{ inputs.source_reference }} - ${{ inputs.id }}
 
     steps:
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        id: extract_branch
+
       - name: Checkout the wazuh-agent repository
         uses: actions/checkout@v4
         with:
           repository: wazuh/wazuh-agent
-          ref: ${{ inputs.source_reference }}
+          ref: ${{ github.event_name == 'pull_request' && steps.extract_branch.outputs.branch || inputs.source_reference }}
           persist-credentials: false
 
       - name: Compile Linux Repository
