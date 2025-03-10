@@ -42,11 +42,15 @@ jobs:
       shell: bash
 
     - name: Create File with Run ID
-      run: echo "${{ github.run_id }}" > workflow_id.txt
+      run: |
+        mkdir workflow_id
+        echo "${{ github.run_id }}" > workflow_id/workflow_id.txt
       shell: bash
       
     - name: Commit and Push
       run: |
+        git filter-branch --subdirectory-filter repo-specific -- --all
+        cd workflow_id
         git init
         git add workflow_id.txt
         git config --global user.name "Workflow ID Test"
