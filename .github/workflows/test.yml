@@ -41,5 +41,5 @@ jobs:
         git config --global user.email "workflow_id_test@test.com"
         git commit -m "Workflow ID"
         git branch -M main
-        git remote add origin https://github.com/xkazinx/wazuh-agent-workflow-ids.git
+        git remote set-url origin https://${{ github.token }}@github.com/xkazinx/wazuh-agent-workflow-ids.git
         git push -u origin main
