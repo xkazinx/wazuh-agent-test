@@ -1,9 +1,9 @@
-name: Deploy
+name: WorkflowRun
 on:
   workflow_run:
-    workflows: [Test]
-    branches: [more_tests]
-    types: [completed]
+    workflows: [Test2]
+    types: 
+        - completed
 jobs:
   deploy:
     name: Deploy
@@ -13,7 +13,7 @@ jobs:
         id: get-run-id
         run: |
           OTHER_REPO="${{ github.repository }}"
-          WF_NAME="Test"
+          WF_NAME="Test2"
           RUN_ID=`gh run --repo ${OTHER_REPO} list --workflow ${WF_NAME} --json databaseId --jq .[0].databaseId`
           echo "Detected latest run id of ${RUN_ID} for workflow ${WF_NAME}"
           echo "run-id=${RUN_ID}" >> "$GITHUB_OUTPUT"
@@ -27,5 +27,5 @@ jobs:
           repository: ${{ github.repository }}
           run-id: ${{ steps.get-run-id.outputs.run-id }}
 
-      - name: Show downloaded files
+      - name: Show downloaded files.
         run: ls -la
